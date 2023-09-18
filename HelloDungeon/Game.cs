@@ -33,6 +33,8 @@ namespace HelloDungeon
         Character JoePable;
         Character JohnCena;
         Character LucyJill;
+        Character[] Enemies;
+        int currentEnemyIndex = 0;
 
         Character Player;
         void PrintStats(Character character)
@@ -61,7 +63,7 @@ namespace HelloDungeon
 
             if (battleChoice == "1")
             {
-                monster2.Health = Attack(Player, monster2);
+                monster2.Health = 0;
                 Console.WriteLine("You used " + Player.CurrentWeapon.Name + " !");
 
                 if (monster2.Health <= 0)
@@ -147,11 +149,11 @@ namespace HelloDungeon
 
         void BattleScene()
         {
-            Fight(ref JohnCena);
+            Fight(ref Enemies[currentEnemyIndex]);
 
             Console.Clear();
 
-            if (Player.Health <= 0 || JohnCena.Health <= 0)
+            if (Player.Health <= 0 || Enemies[currentEnemyIndex].Health <= 0)
             {
                 currentScene = 2;
             }
@@ -159,16 +161,38 @@ namespace HelloDungeon
 
         void WinResultsScene()
         {
-            if (Player.Health > 0 && JohnCena.Health <= 0)
+            if (Player.Health > 0 && Enemies[currentEnemyIndex].Health <= 0)
             {
                 Console.WriteLine("The winner is: " + Player.Name);
+                currentScene = 1;
+                currentEnemyIndex++;
+
+                if (currentEnemyIndex >= Enemies.Length)
+                {
+                    gameOver = true;
+                }
             }
-            else if (JohnCena.Health > 0 && Player.Health <= 0)
+            else if (Enemies[currentEnemyIndex].Health > 0 && Player.Health <= 0)
             {
-                Console.WriteLine("The winner is: " + JohnCena.Name);
+                Console.WriteLine("The winner is: " + Enemies[currentEnemyIndex].Name);
+                currentScene = 3;
             }
             Console.ReadKey(true);
             Console.Clear();
+        }
+
+        void EndGameScene()
+        {
+            string playerChoice = GetInput("You Died. Play Again?", "Yes", "No", "");
+
+            if (playerChoice == "1")
+            {
+                currentScene = 0;
+            }
+            else if (playerChoice == "2")
+            {
+                gameOver = true;
+            }
         }
 
         void Start()
@@ -208,6 +232,10 @@ namespace HelloDungeon
             LucyJill.Defense = .8f;
             LucyJill.Stamina = 0f;
             LucyJill.CurrentWeapon = chairAdjustment;
+
+            //                           0         1         2  
+            Enemies = new Character[3] { JoePable, JohnCena, LucyJill };
+
         }
 
         void Update()
@@ -224,6 +252,10 @@ namespace HelloDungeon
             {
                 WinResultsScene();
             }
+            else if(currentScene == 3)
+            {
+                EndGameScene();
+            }
         }
 
         void End()
@@ -231,47 +263,8 @@ namespace HelloDungeon
             Console.WriteLine("Thanks for playing");
         }
 
-        void SetArrayValue(int[] arr, int index, int value)
-        {
-            arr[index] = value;
-        }
-
-        void SetValue(int[] number, int value)
-        {
-            number[0] = value;
-        }
-
-        void PrintSum(int[] numbers)
-        {
-            //Create a variable to store the sum
-            int sum = 0;
-
-            //Loop through all of the values in the array
-            for (int i = 0; i < numbers.Length; i++)
-            {
-                //Increment sum by each value in the array
-                sum = sum + numbers[i];
-            }
-
-            //Print sum to the console
-            Console.WriteLine(sum);
-        }
-
         public void Run()
         {
-            int[] numbers = new int[3] { 4,1,2 };
-
-            numbers = new int[4] { 1, 2, 23, 4 };
-            PrintSum(numbers);
-
-            ///Create a function that takes in an integer array.
-            ///The function should print out the sum of all of the values
-            ///in the array.
-            ///Input: int[] numbers = new int[3] { 1,2,3 };
-            ///Output: 6
-
-            return;
-
             //start - called before the first loop
             //Used to initialize variables at the beginning of the game.
             Start();
